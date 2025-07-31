@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styled Input Component</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+
+    .input-group {
+      position: relative;
+      max-width: 400px;
+    }
+
+    .input-group + .input-group {
+      margin-top: 16px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 450;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.75rem 3rem 0.75rem 0.75rem;
+      font-size: 1rem;
+      box-sizing: border-box;
+      border: 1px solid #8A8A8A;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:hover {
+      border-color: #616161;
+    }
+
+    input[type="text"]:focus {
+      border-color: #1A1A1A;
+    }
+
+    input[type="text"]::placeholder {
+      color: #AAA;
+    }
+
+    .char-counter {
+      position: absolute;
+      right: 0.75rem;
+      top: 2.5rem;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    .error input[type="text"],
+    .error .prefixed-input {
+      border-color: red;
+    }
+    .error .error-message {
+      display: block;
+    }
+
+    .color-input-wrapper {
+      display: flex;
+      align-items: center;
+    }
+
+    .color-swatch {
+      width: 2.5rem;
+      height: 2.5rem;
+      background-color: #282A2C;
+      border: 1px solid #8A8A8A;
+      border-radius: 8px;
+      margin-right: 4px;
+      flex-shrink: 0;
+    }
+
+    .prefixed-input {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 1px solid #8A8A8A;
+      border-radius: 8px;
+      transition: border-color 0.2s ease;
+    }
+    .prefixed-input:hover {
+      border-color: #616161;
+    }
+    .prefixed-input.focus {
+      border-color: #1A1A1A;
+    }
+    .prefixed-input .prefix {
+      padding: 0 0.5rem;
+      font-size: 1rem;
+      color: #AAA;
+      user-select: none;
+    }
+    .prefixed-input input {
+      border: none;
+      outline: none;
+      padding: 0.75rem 0.75rem 0.75rem 0;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <!-- Původní Button label input -->
+  <div class="input-group" id="inputGroup">
+    <label for="buttonLabel">Button label</label>
+    <input
+      type="text"
+      id="buttonLabel"
+      maxlength="30"
+      value="Continue shopping"
+      placeholder="Continue shopping"
+    />
+    <div class="char-counter" id="charCounter">18 / 30</div>
+    <div class="error-message" id="errorMessage">Button label can’t be blank</div>
+  </div>
+
+  <!-- Nový Background color input -->
+  <div class="input-group" id="backgroundColorGroup">
+    <label for="backgroundColor">Background color</label>
+    <div class="color-input-wrapper">
+      <div class="color-swatch" id="colorSwatch" style="background-color: #282A2C;"></div>
+      <div class="prefixed-input" id="backgroundInputWrapper">
+        <span class="prefix">#</span>
+        <input
+          type="text"
+          id="backgroundColor"
+          value="282A2C"
+          placeholder="282A2C"
+        />
+      </div>
+    </div>
+    <div class="error-message" id="colorErrorMessage">Background color must be a valid HEX code</div>
+  </div>
+
+  <script>
+    const input = document.getElementById('buttonLabel');
+    const charCounter = document.getElementById('charCounter');
+    const inputGroup = document.getElementById('inputGroup');
+
+    function updateCharCounter() {
+      charCounter.textContent = `${input.value.length} / 30`;
+    }
+    input.addEventListener('input', () => {
+      updateCharCounter();
+      inputGroup.classList.remove('error');
+    });
+    updateCharCounter();
+
+    const colorInput = document.getElementById('backgroundColor');
+    const colorSwatch = document.getElementById('colorSwatch');
+    const colorGroup = document.getElementById('backgroundColorGroup');
+    const colorError = document.getElementById('colorErrorMessage');
+    const backgroundInputWrapper = document.getElementById('backgroundInputWrapper');
+
+    function isValidHex(hex) {
+      return /^[0-9A-Fa-f]{3}$/.test(hex) || /^[0-9A-Fa-f]{6}$/.test(hex);
+    }
+
+    colorInput.addEventListener('focus', () => {
+      backgroundInputWrapper.classList.add('focus');
+    });
+    colorInput.addEventListener('blur', () => {
+      backgroundInputWrapper.classList.remove('focus');
+      const val = colorInput.value.trim() || colorInput.placeholder;
+      if (!isValidHex(val)) {
+        colorGroup.classList.add('error');
+      }
+    });
+
+    colorInput.addEventListener('input', () => {
+      const val = colorInput.value.trim();
+      const hex = val || colorInput.placeholder;
+      if (colorGroup.classList.contains('error') && isValidHex(hex)) {
+        colorGroup.classList.remove('error');
+      }
+      if (isValidHex(hex)) {
+        colorSwatch.style.backgroundColor = `#${hex}`;
+      }
+    });
+
+    colorSwatch.style.backgroundColor = `#${colorInput.value}`;
+  </script>
+</body>
+</html>
